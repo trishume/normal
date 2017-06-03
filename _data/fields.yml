@@ -1,0 +1,15 @@
+- id: z-score
+  label: Standard deviations above mean
+  desc: Also known as the z-score.
+- id: fraction
+  label: Percentile
+  desc: The fraction of things with a value less than the Z-score or X sigma.
+- id: percentile
+  label: Percent under threshold
+  desc: The percentage of things with a value less than the Z-score.
+- id: onein
+  label: One In
+  desc: One in X things will have a value greater than the threshold.
+- id: iq
+  label: IQ
+  desc: The Z-score represented as an IQ.

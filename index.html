@@ -1,6 +1,10 @@
+---
+---
 <html>
   <head>
-    <title>Normal Distribution / Standard Deviation Calculator</title>
+    <title>Normal Distribution / Z-Score Calculator</title>
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto+Slab">
+    <link rel="stylesheet" href="vendor/milligram.css">
     <script type="text/javascript" src="vendor/gaussian.js"></script>
     <script type="text/javascript">
       // base unit is fraction
@@ -20,13 +24,13 @@
           "id": "fraction",
           "fromBase": function(frac) {return frac; },
           "toBase": function(frac) {return frac; },
-          "precision": 10,
+          "precision": 15,
         },
         {
           "id": "percentile",
           "fromBase": function(frac) {return frac*100; },
           "toBase": function(percent) {return percent/100.0; },
-          "precision": 8,
+          "precision": 13,
         },
         {
           "id": "onein",
@@ -58,7 +62,8 @@
           if(field.id === ignore) continue;
           var elem = document.getElementById(field.id);
           var value = field.fromBase(model.frac);
-          elem.value = value.toFixed(field.precision);
+          // elem.value = value.toFixed(field.precision);
+          elem.value = value.toLocaleString("en-US", {maximumFractionDigits: field.precision});
         }
       }
 
@@ -68,7 +73,7 @@
             var field = fields[i];
             var elem = document.getElementById(field.id);
             elem.addEventListener('input', function (e) {
-              var value = Number.parseFloat(elem.value);
+              var value = Number.parseFloat(elem.value.replace(/,/g, ''));
               curModel.frac = field.toBase(value);
               render(curModel, field.id);
             }, false);
@@ -81,15 +86,37 @@
         attachHandlers();
       }
     </script>
+    <style type="text/css">
+      .field-desc {
+        margin-bottom: 1.2rem;
+      }
+      .num-field {
+        font-size: 12pt;
+      }
+    </style>
   </head>
   <body onload="loaded()">
-    <h1>Tristan's Normal Distribution Converter</h1>
-    <form>
-      <label for="z-score">Z-Score:</label><input type="text" id="z-score"><br>
-      <label for="fraction">Fraction:</label><input type="text" id="fraction"><br>
-      <label for="percentile">Percentile:</label><input type="text" id="percentile"><br>
-      <label for="onein">One in:</label><input type="text" id="onein"><br>
-      <label for="iq">IQ:</label><input type="text" id="iq"><br>
-    </form>
+    <div class="container">
+      <h2>Tristan's Normal Distribution Calculator</h2>
+      <p>This is a calculator for normal distribution related things, just modify one number and all the other numbers will update as you type. Calculations are done with JS double-precision floats, I don't guarantee its accuracy past 7 standard deviations.</p>
+      <form>
+        {% for field in site.data.fields %}
+          <label for="{{field.id}}">{{field.label}}:</label>
+          <input type="text" id="{{field.id}}" onfocus="this.select();" class="num-field"><br>
+          <p class="field-desc">{{field.desc}}</p>
+        {% endfor %}
+      </form>
+      <p>This was hacked together in 2 hours by <a href="http://thume.ca/">Tristan Hume</a>, the source is <a href="https://github.com/trishume/normal">on Github</a>. File an issue or <a href="mailto:tristan@thume.ca">email me</a> with any requests/bugs.</p>
+    </div>
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-38316132-1', 'auto');
+      ga('send', 'pageview');
+
+    </script>
   </body>
 </html>
