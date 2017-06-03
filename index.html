@@ -1,0 +1,95 @@
+<html>
+  <head>
+    <title>Normal Distribution / Standard Deviation Calculator</title>
+    <script type="text/javascript" src="vendor/gaussian.js"></script>
+    <script type="text/javascript">
+      // base unit is fraction
+      var distribution = gaussian(0,1);
+      var fields = [
+        {
+          "id": "z-score",
+          "fromBase": function(frac) {
+            return distribution.ppf(frac);
+          },
+          "toBase": function(zscore) {
+            return distribution.cdf(zscore);
+          },
+          "precision": 3,
+        },
+        {
+          "id": "fraction",
+          "fromBase": function(frac) {return frac; },
+          "toBase": function(frac) {return frac; },
+          "precision": 10,
+        },
+        {
+          "id": "percentile",
+          "fromBase": function(frac) {return frac*100; },
+          "toBase": function(percent) {return percent/100.0; },
+          "precision": 8,
+        },
+        {
+          "id": "onein",
+          "fromBase": function(frac) {return 1/(1-frac); },
+          "toBase": function(val) {return 1-(1/val); },
+          "precision": 3,
+        },
+        {
+          "id": "iq",
+          "fromBase": function(frac) {
+            var z = distribution.ppf(frac);
+            return 100 + 15*z;
+          },
+          "toBase": function(iq) {
+            var zscore = (iq-100)/15.0;
+            return distribution.cdf(zscore);
+          },
+          "precision": 3,
+        },
+      ];
+
+      var curModel = {
+        frac: 0.5,
+      };
+
+      function render(model,ignore) {
+        for (var i = 0; i < fields.length; i++) {
+          var field = fields[i];
+          if(field.id === ignore) continue;
+          var elem = document.getElementById(field.id);
+          var value = field.fromBase(model.frac);
+          elem.value = value.toFixed(field.precision);
+        }
+      }
+
+      function attachHandlers() {
+        for (var i = 0; i < fields.length; i++) {
+          (function(){
+            var field = fields[i];
+            var elem = document.getElementById(field.id);
+            elem.addEventListener('input', function (e) {
+              var value = Number.parseFloat(elem.value);
+              curModel.frac = field.toBase(value);
+              render(curModel, field.id);
+            }, false);
+          })();
+        }
+      }
+
+      function loaded() {
+        render(curModel,null);
+        attachHandlers();
+      }
+    </script>
+  </head>
+  <body onload="loaded()">
+    <h1>Tristan's Normal Distribution Converter</h1>
+    <form>
+      <label for="z-score">Z-Score:</label><input type="text" id="z-score"><br>
+      <label for="fraction">Fraction:</label><input type="text" id="fraction"><br>
+      <label for="percentile">Percentile:</label><input type="text" id="percentile"><br>
+      <label for="onein">One in:</label><input type="text" id="onein"><br>
+      <label for="iq">IQ:</label><input type="text" id="iq"><br>
+    </form>
+  </body>
+</html>
