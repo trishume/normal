@@ -7,18 +7,23 @@
     <link rel="stylesheet" href="vendor/milligram.css">
     <script type="text/javascript" src="vendor/gaussian.js"></script>
     <script type="text/javascript">
+      // By Tristan Hume
+      // but I'm not proud of this code, it was written to minimize end-to-end
+      // writing time. Not to be nice or maintainable.
+
       // base unit is fraction
       var distribution = gaussian(0,1);
+      function fromZToBase(zscore) {
+        return distribution.cdf(zscore);
+      }
       var fields = [
         {
           "id": "z-score",
           "fromBase": function(frac) {
             return distribution.ppf(frac);
           },
-          "toBase": function(zscore) {
-            return distribution.cdf(zscore);
-          },
-          "precision": 3,
+          "toBase": fromZToBase,
+          "precision": 4,
         },
         {
           "id": "fraction",
@@ -59,11 +64,23 @@
       function render(model,ignore) {
         for (var i = 0; i < fields.length; i++) {
           var field = fields[i];
-          if(field.id === ignore) continue;
           var elem = document.getElementById(field.id);
           var value = field.fromBase(model.frac);
+          if(field.id === "z-score" && history && history.replaceState) {
+            var savedState = value.toFixed(4);
+            if(savedState === "0.0000") {
+              // remove hash
+              history.replaceState("", document.title, window.location.pathname
+                                                       + window.location.search);
+            } else {
+              history.replaceState("", document.title, window.location.pathname
+                                                       + window.location.search + "#" + savedState);
+            }
+          }
+          if(field.id === ignore) continue;
           // elem.value = value.toFixed(field.precision);
           elem.value = value.toLocaleString("en-US", {maximumFractionDigits: field.precision});
+
         }
       }
 
@@ -82,6 +99,13 @@
       }
 
       function loaded() {
+        var found = window.location.hash.match(/^#([\.\d]+)$/);
+        if(found) {
+          var zscore = Number.parseFloat(found[1]);
+          curModel.frac = fromZToBase(zscore);
+          console.log("loaded", found, curModel.frac, zscore);
+        }
+
         render(curModel,null);
         attachHandlers();
       }
