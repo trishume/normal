@@ -32,6 +32,12 @@
           "precision": 15,
         },
         {
+          "id": "invfraction",
+          "fromBase": function(frac) {return 1-frac; },
+          "toBase": function(invfrac) {return 1-invfrac; },
+          "precision": 15,
+        },
+        {
           "id": "percentile",
           "fromBase": function(frac) {return frac*100; },
           "toBase": function(percent) {return percent/100.0; },
